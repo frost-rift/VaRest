@@ -13,7 +13,7 @@
 	"CompatibleEngineVersions": [
 		{
 			"MajorVersion": 5,
-			"MinorVersion": 4
+			"MinorVersion": 6
 		}
 	],
 	"Modules": [
