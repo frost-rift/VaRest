@@ -278,7 +278,7 @@ void FJSONState::PopToken(int32 Num)
 	{
 		if (Tokens.Num() >= Num)
 		{
-			Tokens.RemoveAt(Tokens.Num() - Num, Num, false);
+			Tokens.RemoveAt(Tokens.Num() - Num, Num, EAllowShrinking::No);
 		}
 		else
 		{
@@ -293,7 +293,7 @@ void FJSONState::PopObject()
 {
 	if (Objects.Num() > 0)
 	{
-		const auto Object = Objects.Pop(false);
+		const auto Object = Objects.Pop(EAllowShrinking::No);
 		if (Object->Type == EJson::Object)
 		{
 			return;
@@ -307,7 +307,7 @@ void FJSONState::PopArray()
 {
 	if (Objects.Num() > 0)
 	{
-		const auto Object = Objects.Pop(false);
+		const auto Object = Objects.Pop(EAllowShrinking::No);
 		if (Object->Type == EJson::Array)
 		{
 			return;
@@ -331,7 +331,7 @@ void FJSONState::PopValue(bool bCheckType)
 		}
 		else
 		{
-			Objects.Pop(false);
+			Objects.Pop(EAllowShrinking::No);
 			if (Objects.Num() > 0)
 			{
 				switch (Value->Type)
@@ -347,7 +347,7 @@ void FJSONState::PopValue(bool bCheckType)
 				}
 				case EJson::String:
 				{
-					FJsonValueNonConstString* JsonValueString = ((FJsonValueNonConstString*)Value.Get());
+					FJsonValueNonConstString* JsonValueString = static_cast<FJsonValueNonConstString*>(Value.Get());
 					JsonValueString->AsNonConstString() = Data;
 					JsonValueString->AsNonConstString().Shrink();
 					Size += JsonValueString->AsNonConstString().GetAllocatedSize();
@@ -593,6 +593,7 @@ bool FJSONReader::FindToken(const TCHAR& Char)
 		case ']': State.Tokens.Add(EJSONToken::SQUARE_END); return true;
 		case ',': State.Tokens.Add(EJSONToken::COMMA); return true;
 		case ':': State.Tokens.Add(EJSONToken::COLON); return true;
+		default: ;
 		}
 	}
 	return false;
@@ -904,6 +905,7 @@ void FJSONReader::ReadBasicValue(const TCHAR& Char)
 		State.Quote = Char;
 		return;
 	}
+	default: ;
 	}
 
 	if ((Char >= '0' && Char <= '9') || Char == '-')
@@ -1090,7 +1092,7 @@ void FJSONWriter::Write(TSharedPtr<FJsonValue> JsonValue, FArchive* Writer, bool
 		int ElementsCount = 0;
 		auto Array = JsonValue->AsArray();
 
-		for (auto& ChildJsonValue : Array)
+		for (const auto& ChildJsonValue : Array)
 		{
 			++ElementsCount;
 			Write(ChildJsonValue, Writer, ElementsCount >= Array.Num());
