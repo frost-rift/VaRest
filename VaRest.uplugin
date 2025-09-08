@@ -10,12 +10,6 @@
 	"Category": "Network",
 	"DocsURL": "https://bit.ly/VaRest-Docs",
 	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/e47be161e7a24e928560290abd5dcc4f",
-	"CompatibleEngineVersions": [
-		{
-			"MajorVersion": 5,
-			"MinorVersion": 6
-		}
-	],
 	"Modules": [
 		{
 			"Name": "VaRest",
